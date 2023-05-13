@@ -1,6 +1,30 @@
-use std::{fmt::Display, process::Command};
+use std::{fmt::Display, io::Write, process::Command};
 
-use console::Term;
+use console::{style, Term};
+
+macro_rules! println_cyan {
+    ($term: expr, $($arg:expr),*) => {
+        $term.write_line(&format!("{}", style(format!($($arg,)*)).cyan())).unwrap();
+    };
+}
+
+macro_rules! print_cyan {
+    ($term: expr, $($arg:expr),*) => {
+        $term.write(&format!("{}", style(format!($($arg,)*)).cyan()).as_bytes()).unwrap();
+    };
+}
+
+macro_rules! println_red {
+    ($term: expr, $($arg:expr),*) => {
+        $term.write_line(&format!("{}", style(format!($($arg,)*)).red())).unwrap();
+    };
+}
+
+macro_rules! print_red {
+    ($term: expr, $($arg:expr),*) => {
+        $term.write(&format!("{}", style(format!($($arg,)*)).red()).as_bytes()).unwrap();
+    };
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum CommitError {
@@ -120,37 +144,30 @@ impl CommitType {
     }
 }
 
-fn prompt_commit_type(term: &Term) {
+fn get_commit_type(term: &mut Term) -> CommitType {
     for (i, commit_type) in CommitType::types().iter().enumerate() {
-        term.write_line(&format!("{}. {}", i + 1, commit_type))
-            .unwrap();
-        term.write_line(&format!("   {}", commit_type.describe()))
-            .unwrap();
+        println_cyan!(
+            term,
+            "{}. {}: {}",
+            i + 1,
+            style(commit_type).bold(),
+            style(commit_type.describe()).cyan().dim()
+        );
     }
-}
+    print_cyan!(term, "{}", style("Enter the type of the commit: ").bold());
 
-fn prompt_enter_commit_type(term: &Term) {
-    term.write_line("Enter the index of the commit type:")
-        .unwrap();
-}
-
-fn get_commit_type(term: &Term) -> CommitType {
     let mut input = term.read_line().unwrap();
     let mut commit_res = CommitType::from_index_str(&input);
     while let Err(err) = commit_res.clone() {
-        term.write_line(&format!("{}", err)).unwrap();
+        println_red!(term, "{}", err);
         input = term.read_line().unwrap();
         commit_res = CommitType::from_index_str(&input);
     }
     commit_res.unwrap()
 }
 
-fn prompt_commit_scope(term: &Term) {
-    term.write_line("Enter the scope of the commit: (press enter to continue with no scope)")
-        .unwrap();
-}
-
-fn get_commit_scope(term: &Term) -> Option<String> {
+fn get_commit_scope(term: &mut Term) -> Option<String> {
+    print_cyan!(term, "{}", style("Enter the scope of the commit: ").bold());
     let input = term.read_line().unwrap();
     if input.is_empty() {
         return None;
@@ -158,17 +175,18 @@ fn get_commit_scope(term: &Term) -> Option<String> {
     Some(input)
 }
 
-fn prompt_commit_subject(term: &Term) {
-    term.write_line("Enter the subject of the commit:").unwrap();
-}
-
-fn get_commit_subject(term: &Term) -> String {
+fn get_commit_subject(term: &mut Term) -> String {
+    print_cyan!(
+        term,
+        "{}",
+        style("Enter the subject of the commit: ").bold()
+    );
     let mut res = term.read_line().unwrap();
     while res.is_empty() {
-        term.write_line(
-            "Subject cannot be empty, please re-enter a valid subject.",
-        )
-        .unwrap();
+        println_red!(
+            term,
+            "Subject cannot be empty, please re-enter a valid subject."
+        );
         res = term.read_line().unwrap();
     }
     // un-capitalise first letter
@@ -180,14 +198,10 @@ fn get_commit_subject(term: &Term) -> String {
 }
 
 fn main() {
-    let term = Term::stdout();
-    prompt_commit_type(&term);
-    prompt_enter_commit_type(&term);
-    let commit_type = get_commit_type(&term);
-    prompt_commit_scope(&term);
-    let commit_scope = get_commit_scope(&term);
-    prompt_commit_subject(&term);
-    let commit_subject = get_commit_subject(&term);
+    let mut term = Term::stdout();
+    let commit_type = get_commit_type(&mut term);
+    let commit_scope = get_commit_scope(&mut term);
+    let commit_subject = get_commit_subject(&mut term);
     let commit = Commit {
         commit_type,
         scope: commit_scope.as_deref(),
