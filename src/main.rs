@@ -20,11 +20,11 @@ macro_rules! println_red {
     };
 }
 
-macro_rules! print_red {
-    ($term: expr, $($arg:expr),*) => {
-        $term.write(&format!("{}", style(format!($($arg,)*)).red()).as_bytes()).unwrap();
-    };
-}
+// macro_rules! print_red {
+//     ($term: expr, $($arg:expr),*) => {
+//         $term.write(&format!("{}", style(format!($($arg,)*)).red()).as_bytes()).unwrap();
+//     };
+// }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum CommitError {
