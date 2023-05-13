@@ -1,3 +1,5 @@
+use console::Term;
+
 fn main() {
-    println!("Hello, world!");
+    let term = Term::stdout();
 }
