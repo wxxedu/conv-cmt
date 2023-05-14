@@ -210,10 +210,15 @@ fn main() {
     let command_str = format!("git commit -m \"{}\"", commit);
     let command = Command::new("sh")
         .arg("-c")
-        .arg(command_str)
+        .arg(command_str.clone())
         .spawn()
-        .expect("failed to execute process");
-    let output = command.wait_with_output().unwrap();
+        .or_else(|_| Command::new("cmd").arg("/C").arg(command_str).spawn());
+    if let Err(err) = command {
+        println_red!(term, "{}", err);
+        return;
+    }
+
+    let output = command.unwrap().wait_with_output().unwrap();
     if output.status.success() {
         term.write_line("Commit successful!").unwrap();
     } else {
