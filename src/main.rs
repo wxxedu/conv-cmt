@@ -172,6 +172,11 @@ fn get_commit_scope(term: &mut Term) -> Option<String> {
     if input.is_empty() {
         return None;
     }
+    // un-capitalise first letter
+    let mut chars = input.chars();
+    if let Some(first) = chars.next() {
+        return Some(first.to_lowercase().to_string() + chars.as_str());
+    }
     Some(input)
 }
 
