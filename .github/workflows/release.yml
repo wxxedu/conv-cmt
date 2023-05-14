@@ -27,7 +27,7 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: Release Build
+          name: Linux Release
           path: target/release/gcmt
 
   build-macos:
@@ -51,7 +51,7 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: Release Build
+          name: MacOS Release
           path: target/release/gcmt
 
   build-windows:
@@ -75,6 +75,6 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: Release Build
+          name: Windows Release
           path: target/release/gcmt.exe
 
