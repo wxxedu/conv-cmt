@@ -17,8 +17,6 @@ impl Shell {
     }
 
     pub fn new_git_command() -> Command {
-        let mut cmd = Self::new_command();
-        cmd.arg("git");
-        cmd
+        Command::new("git")
     }
 }

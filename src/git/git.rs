@@ -10,7 +10,8 @@ impl Git {
             .arg("--porcelain")
             .output()
             .expect("Failed to execute git status");
-
-        !output.stdout.is_empty()
+        let out_str = String::from_utf8(output.stdout).unwrap();
+        println!("{}", out_str);
+        !out_str.is_empty()
     }
 }
