@@ -81,14 +81,6 @@ impl GitChange {
             panic!("Failed to execute git reset");
         }
     }
-
-    pub fn toggle_stage(&mut self) {
-        match self.status {
-            GitChangeStatus::Staged => self.unstage(),
-            GitChangeStatus::Unstaged => self.stage(),
-            GitChangeStatus::Untracked => self.stage(),
-        }
-    }
 }
 
 pub trait GitChanges {
