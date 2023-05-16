@@ -56,10 +56,7 @@ fn logic() {
     let description = ask_description();
     commit_builder = commit_builder.description(&description);
     let commit = commit_builder.build().unwrap();
-    println!("{}", commit);
-
     Git::commit(&commit);
-
     let push = ask_push();
     if push {
         Git::push();
