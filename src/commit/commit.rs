@@ -46,8 +46,8 @@ impl<'a> Display for Commit<'a> {
         // would make it such that every time the commit is displayed, it
         // would run once, which isn't very efficient. Regardless, i will
         // leave it here for now.
-        let pattern = Regex::new(r#"(?<!\\)""#).unwrap();
-        let content = pattern.replace_all(&content, r#"\""#);
+        // let pattern = Regex::new(r#"(?<!\\)""#).unwrap();
+        // let content = pattern.replace_all(&content, r#"\""#);
         write!(f, "{}", content)
     }
 }
