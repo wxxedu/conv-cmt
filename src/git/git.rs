@@ -62,9 +62,6 @@ impl Git {
             .expect("Failed to execute git push");
         if !output.status.success() {
             panic!("Failed to execute git push");
-        } else {
-            // print out
-            println!("{}", String::from_utf8(output.stdout).unwrap());
         }
     }
 
