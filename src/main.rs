@@ -3,7 +3,6 @@ use crate::git::git::Git;
 mod commit;
 mod config;
 mod git;
-mod logic;
 mod ui;
 
 fn main() {
@@ -13,4 +12,3 @@ fn main() {
     }
     Git::stage_all();
 }
-
