@@ -30,7 +30,13 @@ impl<'a> Display for Commit<'a> {
             None => String::new(),
         };
         let description = match self.description {
-            Some(description) => format!("\n\n{}", description),
+            Some(description) => {
+                if description.is_empty() {
+                    String::new()
+                } else {
+                    format!("\n\n{}", description)
+                }
+            }
             None => String::new(),
         };
         let breaking = if self.is_breaking_change { "!" } else { "" };
