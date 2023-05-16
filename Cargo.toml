@@ -7,4 +7,9 @@ edition = "2021"
 
 [dependencies]
 console = "0.15.5"
+dialoguer = "0.10.4"
+indicatif = "0.17.3"
+lazy_static = "1.4.0"
+serde = {version = "1.0.163", features = ["derive"]}
+toml = "0.7.3"
 
