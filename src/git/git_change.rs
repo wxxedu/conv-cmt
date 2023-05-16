@@ -66,7 +66,7 @@ impl GitChange {
             .expect("Failed to execute git add");
         self.status = GitChangeStatus::Staged;
         if !output.status.success() {
-            panic!("Failed to execute git add");
+            panic!("Failed to execute git add: {:?}", output);
         }
     }
 
@@ -79,6 +79,14 @@ impl GitChange {
         self.status = GitChangeStatus::Unstaged;
         if !output.status.success() {
             panic!("Failed to execute git reset");
+        }
+    }
+
+    pub fn toggle_stage(&mut self) {
+        match self.status {
+            GitChangeStatus::Staged => self.unstage(),
+            GitChangeStatus::Unstaged => self.stage(),
+            GitChangeStatus::Untracked => self.stage(),
         }
     }
 }

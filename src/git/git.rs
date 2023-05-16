@@ -25,11 +25,14 @@ impl Git {
                 Some(' ') => GitChangeStatus::Unstaged,
                 Some('M') => GitChangeStatus::Staged,
                 Some('?') => GitChangeStatus::Untracked,
+                Some('A') => GitChangeStatus::Staged,
                 _ => panic!("Unknown git status: {}", line),
             };
             chars.pop();
             chars.reverse();
             let path = chars.iter().collect::<String>();
+            // strip white space
+            let path = path.trim();
             changes.push(GitChange {
                 path: path.to_string(),
                 status,
@@ -47,6 +50,16 @@ impl Git {
             .expect("Failed to execute git add");
         if !output.status.success() {
             panic!("Failed to execute git add");
+        }
+    }
+
+    pub fn push() {
+        let output = Self::new_git_command()
+            .arg("push")
+            .output()
+            .expect("Failed to execute git push");
+        if !output.status.success() {
+            panic!("Failed to execute git push");
         }
     }
 }
