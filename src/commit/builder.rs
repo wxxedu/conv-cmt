@@ -9,6 +9,7 @@ pub struct CommitBuilder<'a> {
     scope: Option<&'a str>,
     subject: Option<&'a str>,
     description: Option<&'a str>,
+    is_breaking_change: bool,
     pub strategy: CaseStrategy,
 }
 
@@ -52,6 +53,12 @@ impl<'a> CommitBuilder<'a> {
         self
     }
 
+    /// Marks the commit as a breaking change.
+    pub fn breaking_change(&mut self) -> &mut Self {
+        self.is_breaking_change = true;
+        self
+    }
+
     /// Builds the commit.
     pub fn build(&self) -> Result<Commit<'a>, CommitError> {
         let commit_type = self
@@ -72,6 +79,7 @@ impl<'a> CommitBuilder<'a> {
             scope: self.scope,
             subject,
             description: self.description,
+            is_breaking_change: self.is_breaking_change,
         })
     }
 }

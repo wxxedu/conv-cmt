@@ -1,5 +1,7 @@
 use std::process::Command;
 
+use crate::commit::commit::Commit;
+
 use super::git_change::{GitChange, GitChangeStatus};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -60,6 +62,18 @@ impl Git {
             .expect("Failed to execute git push");
         if !output.status.success() {
             panic!("Failed to execute git push");
+        }
+    }
+
+    pub fn commit(cmt: &Commit) {
+        let output = Self::new_git_command()
+            .arg("commit")
+            .arg("-m")
+            .arg(&cmt.to_string())
+            .output()
+            .expect("Failed to execute git commit");
+        if !output.status.success() {
+            panic!("Failed to execute git commit");
         }
     }
 }

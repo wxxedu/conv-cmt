@@ -47,18 +47,18 @@ impl CaseStrategy {
     /// Verify that the scope matches the case strategy
     pub fn verify<T: AsRef<str>>(&self, scope: T) -> bool {
         match *self {
+            CaseStrategy::Unchanged => true,
             CaseStrategy::Lowercase => {
-                scope.as_ref().chars().all(|c| c.is_lowercase())
+                scope.as_ref().to_lowercase() == scope.as_ref()
             }
             CaseStrategy::Uppercase => {
-                scope.as_ref().chars().all(|c| c.is_uppercase())
+                scope.as_ref().to_uppercase() == scope.as_ref()
             }
             CaseStrategy::Capitalized => {
-                let mut chars = scope.as_ref().chars();
-                chars.next().unwrap().is_uppercase()
-                    && chars.all(|c| c.is_lowercase())
+                let mut scope = scope.as_ref().to_lowercase();
+                scope[..1].make_ascii_uppercase();
+                scope == scope.as_ref()
             }
-            CaseStrategy::Unchanged => true,
         }
     }
 }
