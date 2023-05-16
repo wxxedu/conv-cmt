@@ -8,7 +8,7 @@ use ui::{
     git_stage::show_stage_all_or_select_view,
 };
 
-use crate::git::git::Git;
+use crate::{git::git::Git, ui::git_push::ask_push};
 
 mod commit;
 mod config;
@@ -59,6 +59,11 @@ fn logic() {
     println!("{}", commit);
 
     Git::commit(&commit);
+
+    let push = ask_push();
+    if push {
+        Git::push();
+    }
 }
 
 fn main() {
