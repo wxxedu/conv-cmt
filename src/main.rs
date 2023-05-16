@@ -18,13 +18,7 @@ mod ui;
 fn logic() {
     // add
     let mut changes = Git::changes();
-    if changes.is_empty() || !changes.has_changes() {
-        println!("No changes to stage");
-        return;
-    }
-    if changes.has_unstaged_changes() {
-        show_stage_all_or_select_view(&mut changes);
-    }
+    show_stage_all_or_select_view(&mut changes);
 
     // commit
     let strat = CaseStrategy::Lowercase;
