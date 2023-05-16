@@ -1,7 +1,5 @@
 use std::fmt::Display;
 
-use regex::Regex;
-
 use super::{
     builder::CommitBuilder, cmt_type::CommitType, strategy::CaseStrategy,
 };
