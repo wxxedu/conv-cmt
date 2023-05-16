@@ -7,11 +7,13 @@ use crate::git::{
 
 pub fn show_stage_all_or_select_view(changes: &mut Vec<GitChange>) {
     let choices = vec!["Stage all", "Stage selected"];
-    let selection = dialoguer::Select::new()
-        .items(&choices)
-        .default(0)
-        .interact()
-        .unwrap();
+    let selection = dialoguer::Select::with_theme(
+        &dialoguer::theme::ColorfulTheme::default(),
+    )
+    .items(&choices)
+    .default(0)
+    .interact()
+    .unwrap();
     match selection {
         0 => Git::stage_all(),
         1 => show_stage_select_view(changes),
@@ -26,11 +28,12 @@ pub fn show_stage_select_view(changes: &mut Vec<GitChange>) {
             checked[i] = true;
         }
     }
-    let selected = MultiSelect::new()
-        .items(&changes)
-        .defaults(&checked)
-        .interact()
-        .unwrap();
+    let selected =
+        MultiSelect::with_theme(&dialoguer::theme::ColorfulTheme::default())
+            .items(&changes)
+            .defaults(&checked)
+            .interact()
+            .unwrap();
     for i in 0..changes.len() {
         if selected.contains(&i) {
             changes[i].stage();

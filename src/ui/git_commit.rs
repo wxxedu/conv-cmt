@@ -1,9 +1,9 @@
-use dialoguer::Select;
+use dialoguer::{theme::ColorfulTheme, Select};
 
 use crate::commit::cmt_type::CommitType;
 
 pub fn ask_commit_type<'a>(types: &Vec<CommitType<'a>>) -> CommitType<'a> {
-    let selected = Select::new()
+    let selected = Select::with_theme(&ColorfulTheme::default())
         .with_prompt("Commit type")
         .default(0)
         .items(&types)
@@ -13,7 +13,7 @@ pub fn ask_commit_type<'a>(types: &Vec<CommitType<'a>>) -> CommitType<'a> {
 }
 
 pub fn ask_scope() -> Option<String> {
-    let res = dialoguer::Input::<String>::new()
+    let res = dialoguer::Input::<String>::with_theme(&ColorfulTheme::default())
         .with_prompt("Scope")
         .allow_empty(true)
         .interact();
@@ -30,17 +30,18 @@ pub fn ask_scope() -> Option<String> {
 }
 
 pub fn ask_subject() -> String {
-    dialoguer::Input::<String>::new()
+    dialoguer::Input::<String>::with_theme(&ColorfulTheme::default())
         .with_prompt("Subject")
         .interact()
         .unwrap()
 }
 
 pub fn ask_description() -> String {
-    let should_add_description = dialoguer::Confirm::new()
-        .with_prompt("Add a description?")
-        .interact()
-        .unwrap();
+    let should_add_description =
+        dialoguer::Confirm::with_theme(&ColorfulTheme::default())
+            .with_prompt("Add a description?")
+            .interact()
+            .unwrap();
     if should_add_description {
         let res = dialoguer::Editor::new().edit("").unwrap();
         match res {
