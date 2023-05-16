@@ -1,17 +1,52 @@
-use super::shell::Shell;
+use std::process::Command;
+
+use super::git_change::{GitChange, GitChangeStatus};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Git;
 
 impl Git {
-    pub fn has_changes() -> bool {
-        let output = Shell::new_git_command()
+    pub fn new_git_command() -> Command {
+        Command::new("git")
+    }
+
+    pub fn changes() -> Vec<GitChange> {
+        let output = Self::new_git_command()
             .arg("status")
             .arg("--porcelain")
             .output()
             .expect("Failed to execute git status");
         let out_str = String::from_utf8(output.stdout).unwrap();
-        println!("{}", out_str);
-        !out_str.is_empty()
+        let mut changes = Vec::new();
+        for line in out_str.lines() {
+            let mut chars = line.chars().collect::<Vec<char>>();
+            chars.reverse();
+            let status = match chars.pop() {
+                Some(' ') => GitChangeStatus::Unstaged,
+                Some('M') => GitChangeStatus::Staged,
+                Some('?') => GitChangeStatus::Untracked,
+                _ => panic!("Unknown git status: {}", line),
+            };
+            chars.pop();
+            chars.reverse();
+            let path = chars.iter().collect::<String>();
+            changes.push(GitChange {
+                path: path.to_string(),
+                status,
+            });
+        }
+        changes.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        changes
+    }
+
+    pub fn stage_all() {
+        let output = Self::new_git_command()
+            .arg("add")
+            .arg(".")
+            .output()
+            .expect("Failed to execute git add");
+        if !output.status.success() {
+            panic!("Failed to execute git add");
+        }
     }
 }

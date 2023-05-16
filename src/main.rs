@@ -6,6 +6,10 @@ mod git;
 mod ui;
 
 fn main() {
-    println!("Has changes: {}", Git::has_changes());
+    let changes = Git::changes();
+    for change in changes {
+        println!("{}", change);
+    }
+    Git::stage_all();
 }
 
