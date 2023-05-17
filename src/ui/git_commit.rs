@@ -54,7 +54,9 @@ pub fn ask_description() -> String {
 
 pub fn ask_breaking_change() -> bool {
     dialoguer::Confirm::with_theme(&ColorfulTheme::default())
-        .with_prompt("Is this a breaking change?")
+        .with_prompt(
+            "Is this a safe change? (answer no if this is a breaking change)",
+        )
         .interact()
         .unwrap()
 }

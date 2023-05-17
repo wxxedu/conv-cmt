@@ -47,8 +47,8 @@ fn logic() {
     commit_builder = commit_builder.subject(&subject).unwrap();
     let description = ask_description();
     commit_builder = commit_builder.description(&description);
-    let breaking_change = ask_breaking_change();
-    if breaking_change {
+    let safe_change = ask_breaking_change();
+    if !safe_change {
         commit_builder = commit_builder.breaking_change();
     }
     let commit = commit_builder.build().unwrap();
