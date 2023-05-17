@@ -1,9 +1,9 @@
-use dialoguer::{theme::ColorfulTheme, Select};
+use dialoguer::{theme::ColorfulTheme, FuzzySelect};
 
 use crate::commit::cmt_type::CommitType;
 
 pub fn ask_commit_type<'a>(types: &Vec<CommitType<'a>>) -> CommitType<'a> {
-    let selected = Select::with_theme(&ColorfulTheme::default())
+    let selected = FuzzySelect::with_theme(&ColorfulTheme::default())
         .with_prompt("Commit type")
         .default(0)
         .items(&types)
