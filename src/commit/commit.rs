@@ -6,30 +6,30 @@ use super::{
 
 /// Represents a commit.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub struct Commit<'a> {
-    pub commit_type: CommitType<'a>,
-    pub scope: Option<&'a str>,
-    pub subject: &'a str,
-    pub description: Option<&'a str>,
+pub struct Commit {
+    pub commit_type: CommitType,
+    pub scope: Option<String>,
+    pub subject: String,
+    pub description: Option<String>,
     pub is_breaking_change: bool,
 }
 
-impl<'a> Commit<'a> {
+impl Commit {
     /// Creates a builder that can be used to build a new commit.
-    pub fn builder(strategy: CaseStrategy) -> CommitBuilder<'a> {
+    pub fn builder(strategy: CaseStrategy) -> CommitBuilder {
         let mut builder = CommitBuilder::default();
         builder.strategy = strategy;
         builder
     }
 }
 
-impl<'a> Display for Commit<'a> {
+impl Display for Commit {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let scope = match self.scope {
+        let scope = match &self.scope {
             Some(scope) => format!("({})", scope),
             None => String::new(),
         };
-        let description = match self.description {
+        let description = match &self.description {
             Some(description) => {
                 if description.is_empty() {
                     String::new()

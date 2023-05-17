@@ -25,10 +25,7 @@ impl Git {
             chars.reverse();
             let status = match chars.pop() {
                 Some(' ') => GitChangeStatus::Unstaged,
-                Some('M') => GitChangeStatus::Staged,
-                Some('?') => GitChangeStatus::Untracked,
-                Some('A') => GitChangeStatus::Staged,
-                _ => panic!("Unknown git status: {}", line),
+                _ => GitChangeStatus::Staged,
             };
             chars.pop();
             chars.reverse();

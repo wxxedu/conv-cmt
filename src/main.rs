@@ -1,26 +1,17 @@
-use commit::{cmt_type::CommitType, commit::Commit, strategy::CaseStrategy};
-use ui::{
-    git_commit::{
-        ask_breaking_change, ask_commit_type, ask_description, ask_scope,
-        ask_subject,
-    },
-    git_stage::show_stage_select_view,
-};
+use std::{env, ffi::OsString};
 
-use crate::{git::git::Git, ui::git_push::ask_push};
-
+use commit::{cmt_type::CommitType, strategy::CaseStrategy};
+use console::Term;
+use dialoguer::theme::ColorfulTheme;
+use ui::git_ui::{self, GitUI};
 mod commit;
 mod git;
 mod ui;
 
-fn logic() {
-    // add
-    let mut changes = Git::changes();
-    show_stage_select_view(&mut changes);
-
-    // commit
-    let strat = CaseStrategy::Lowercase;
-    let mut commit_builder = &mut Commit::builder(strat);
+fn main() {
+    // prep
+    let mut term = Term::stdout();
+    let theme = ColorfulTheme::default();
     let types = vec![
         CommitType::new("feat", Some("A new feature")),
         CommitType::new("fix", Some("A bug fix")),
@@ -34,31 +25,11 @@ fn logic() {
         CommitType::new("chore", Some("Other changes that don't modify src or test files")),
         CommitType::new("revert", Some("Reverts a previous commit")),
     ];
-    let res = ask_commit_type(&types);
-    commit_builder = commit_builder.commit_type(res);
-    let scope = ask_scope();
-    let scope_str;
-    if let Some(scope) = scope {
-        scope_str = strat.apply(&scope);
-        commit_builder = commit_builder.scope(&scope_str).unwrap();
-    }
-    let subject = ask_subject();
-    let subject = strat.apply(&subject);
-    commit_builder = commit_builder.subject(&subject).unwrap();
-    let description = ask_description();
-    commit_builder = commit_builder.description(&description);
-    let safe_change = ask_breaking_change();
-    if !safe_change {
-        commit_builder = commit_builder.breaking_change();
-    }
-    let commit = commit_builder.build().unwrap();
-    Git::commit(&commit);
-    let push = ask_push();
-    if push {
-        Git::push();
-    }
-}
+    let strat = CaseStrategy::Lowercase;
+    let editor =
+        env::var_os("EDITOR").unwrap_or_else(|| OsString::from("nvim"));
 
-fn main() {
-    logic();
+    let mut ui = GitUI::new(&mut term, theme, &types, strat, editor);
+
+    ui.show();
 }
