@@ -45,6 +45,8 @@ start using gcmt by typing `gcmt` in the terminal.
 
 ## Features
 
+![gcmt](./docs/images/demo.gif)
+
 - **List & Select Unstaged Files**: once `gcmt` command is run, it will show
   you the list of files that are not committed. You can press `a` to select
   all, or select the ones that you want to commit.
