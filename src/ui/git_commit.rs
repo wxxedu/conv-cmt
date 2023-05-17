@@ -1,3 +1,5 @@
+use std::env;
+
 use dialoguer::{theme::ColorfulTheme, Confirm, Editor, FuzzySelect, Input};
 
 use crate::commit::cmt_type::CommitType;
@@ -22,6 +24,8 @@ pub fn ask_scope() -> Option<String> {
             if scope.is_empty() {
                 None
             } else {
+                use std::env;
+
                 Some(scope)
             }
         }
@@ -42,7 +46,9 @@ pub fn ask_description() -> String {
         .interact()
         .unwrap();
     if should_add_description {
-        let res = Editor::new().edit("").unwrap();
+        let exec = env::var("EDITOR").unwrap_or("vim".to_string());
+        dbg!(&exec);
+        let res = Editor::new().executable(exec).edit("").unwrap();
         match res {
             Some(description) => description,
             None => String::new(),
