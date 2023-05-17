@@ -1,4 +1,4 @@
-use dialoguer::{theme::ColorfulTheme, FuzzySelect};
+use dialoguer::{theme::ColorfulTheme, Confirm, Editor, FuzzySelect, Input};
 
 use crate::commit::cmt_type::CommitType;
 
@@ -13,7 +13,7 @@ pub fn ask_commit_type<'a>(types: &Vec<CommitType<'a>>) -> CommitType<'a> {
 }
 
 pub fn ask_scope() -> Option<String> {
-    let res = dialoguer::Input::<String>::with_theme(&ColorfulTheme::default())
+    let res = Input::<String>::with_theme(&ColorfulTheme::default())
         .with_prompt("Scope")
         .allow_empty(true)
         .interact();
@@ -30,20 +30,19 @@ pub fn ask_scope() -> Option<String> {
 }
 
 pub fn ask_subject() -> String {
-    dialoguer::Input::<String>::with_theme(&ColorfulTheme::default())
+    Input::<String>::with_theme(&ColorfulTheme::default())
         .with_prompt("Subject")
         .interact()
         .unwrap()
 }
 
 pub fn ask_description() -> String {
-    let should_add_description =
-        dialoguer::Confirm::with_theme(&ColorfulTheme::default())
-            .with_prompt("Add a description?")
-            .interact()
-            .unwrap();
+    let should_add_description = Confirm::with_theme(&ColorfulTheme::default())
+        .with_prompt("Add a description?")
+        .interact()
+        .unwrap();
     if should_add_description {
-        let res = dialoguer::Editor::new().edit("").unwrap();
+        let res = Editor::new().edit("").unwrap();
         match res {
             Some(description) => description,
             None => String::new(),
