@@ -1,4 +1,4 @@
-use std::ffi::OsStr;
+use std::{ffi::OsStr, io::Write};
 
 use console::{style, Term};
 use dialoguer::{
@@ -254,7 +254,16 @@ impl<'a, T: AsRef<OsStr>, K: Theme> GitUI<'a, T, K> {
             .unwrap();
         match res {
             0 => {
-                Git::commit(&commit);
+                let res = Git::commit(&commit);
+                match res {
+                    Ok(msg) => {
+                        self.term.write(&msg).unwrap();
+                    }
+                    Err(error) => {
+                        self.term.write(&error).unwrap();
+                        self.ask_review_commit();
+                    }
+                }
             }
             1 => {
                 self.ask_commit_type();
@@ -297,7 +306,16 @@ impl<'a, T: AsRef<OsStr>, K: Theme> GitUI<'a, T, K> {
             .interact()
             .unwrap();
         if res {
-            Git::push();
+            let res = Git::push();
+            match res {
+                Ok(msg) => {
+                    self.term.write(&msg).unwrap();
+                }
+                Err(error) => {
+                    self.term.write(&error).unwrap();
+                    self.ask_push();
+                }
+            }
         }
     }
 }
