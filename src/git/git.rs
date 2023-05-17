@@ -38,19 +38,19 @@ impl Git {
         changes
     }
 
-    pub fn push() -> Result<Vec<u8>, Vec<u8>> {
+    pub fn push() -> Result<String, String> {
         let output = Self::new_git_command()
             .arg("push")
             .output()
             .expect("Failed to execute git push");
         if output.status.success() {
-            Ok(output.stdout)
+            Ok(String::from_utf8(output.stdout).unwrap())
         } else {
-            Err(output.stderr)
+            Err(String::from_utf8(output.stderr).unwrap())
         }
     }
 
-    pub fn commit(cmt: &Commit) -> Result<Vec<u8>, Vec<u8>> {
+    pub fn commit(cmt: &Commit) -> Result<String, String> {
         let output = Self::new_git_command()
             .arg("commit")
             .arg("-m")
@@ -58,9 +58,9 @@ impl Git {
             .output()
             .expect("Failed to execute git commit");
         if output.status.success() {
-            Ok(output.stdout)
+            Ok(String::from_utf8(output.stdout).unwrap())
         } else {
-            Err(output.stderr)
+            Err(String::from_utf8(output.stderr).unwrap())
         }
     }
 }
