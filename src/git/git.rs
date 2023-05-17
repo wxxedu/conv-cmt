@@ -25,10 +25,7 @@ impl Git {
             chars.reverse();
             let status = match chars.pop() {
                 Some(' ') => GitChangeStatus::Unstaged,
-                Some('M') => GitChangeStatus::Staged,
-                Some('?') => GitChangeStatus::Untracked,
-                Some('A') => GitChangeStatus::Staged,
-                _ => panic!("Unknown git status: {}", line),
+                _ => GitChangeStatus::Staged,
             };
             chars.pop();
             chars.reverse();
@@ -41,25 +38,29 @@ impl Git {
         changes
     }
 
-    pub fn push() {
+    pub fn push() -> Result<String, String> {
         let output = Self::new_git_command()
             .arg("push")
             .output()
             .expect("Failed to execute git push");
-        if !output.status.success() {
-            panic!("Failed to execute git push");
+        if output.status.success() {
+            Ok(String::from_utf8(output.stdout).unwrap())
+        } else {
+            Err(String::from_utf8(output.stderr).unwrap())
         }
     }
 
-    pub fn commit(cmt: &Commit) {
+    pub fn commit(cmt: &Commit) -> Result<String, String> {
         let output = Self::new_git_command()
             .arg("commit")
             .arg("-m")
             .arg(&cmt.to_string())
             .output()
             .expect("Failed to execute git commit");
-        if !output.status.success() {
-            panic!("Failed to execute git commit");
+        if output.status.success() {
+            Ok(String::from_utf8(output.stdout).unwrap())
+        } else {
+            Err(String::from_utf8(output.stderr).unwrap())
         }
     }
 }

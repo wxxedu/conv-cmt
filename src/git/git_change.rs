@@ -4,7 +4,6 @@ use std::fmt::Display;
 pub enum GitChangeStatus {
     Staged,
     Unstaged,
-    Untracked,
 }
 
 impl Display for GitChangeStatus {
@@ -12,7 +11,6 @@ impl Display for GitChangeStatus {
         let status_str = match self {
             GitChangeStatus::Staged => "Staged",
             GitChangeStatus::Unstaged => "Unstaged",
-            GitChangeStatus::Untracked => "Untracked",
         };
         write!(f, "{}", status_str)
     }
@@ -23,7 +21,6 @@ impl GitChangeStatus {
         match self {
             GitChangeStatus::Staged => 0,
             GitChangeStatus::Unstaged => 1,
-            GitChangeStatus::Untracked => 2,
         }
     }
 }
@@ -62,11 +59,14 @@ impl GitChange {
         let output = super::git::Git::new_git_command()
             .arg("add")
             .arg(&self.path)
-            .output()
-            .expect("Failed to execute git add");
-        self.status = GitChangeStatus::Staged;
-        if !output.status.success() {
-            panic!("Failed to execute git add: {:?}", output);
+            .output();
+        match output {
+            Ok(output) => {
+                if output.status.success() {
+                    self.status = GitChangeStatus::Staged;
+                }
+            }
+            Err(_) => {}
         }
     }
 
@@ -74,11 +74,14 @@ impl GitChange {
         let output = super::git::Git::new_git_command()
             .arg("reset")
             .arg(&self.path)
-            .output()
-            .expect("Failed to execute git reset");
-        self.status = GitChangeStatus::Unstaged;
-        if !output.status.success() {
-            panic!("Failed to execute git reset");
+            .output();
+        match output {
+            Ok(output) => {
+                if output.status.success() {
+                    self.status = GitChangeStatus::Unstaged;
+                }
+            }
+            Err(_) => {}
         }
     }
 }
@@ -86,7 +89,6 @@ impl GitChange {
 pub trait GitChanges {
     fn has_staged_changes(&self) -> bool;
     fn has_unstaged_changes(&self) -> bool;
-    fn has_untracked_changes(&self) -> bool;
     fn has_changes(&self) -> bool;
 }
 
@@ -99,11 +101,6 @@ impl GitChanges for Vec<GitChange> {
     fn has_unstaged_changes(&self) -> bool {
         self.iter()
             .any(|change| change.status == GitChangeStatus::Unstaged)
-    }
-
-    fn has_untracked_changes(&self) -> bool {
-        self.iter()
-            .any(|change| change.status == GitChangeStatus::Untracked)
     }
 
     fn has_changes(&self) -> bool {
