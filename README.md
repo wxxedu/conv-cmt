@@ -47,24 +47,24 @@ start using gcmt by typing `gcmt` in the terminal.
 
 There are several things that I wish to do in the future:
 
-**Custom Config**: I wish to add custom config to GCMT such that if you were to
-use this app, you can custom define some of the currently hard-coded values.
-Much of the structure is there for this change, but I still need to get the
-implementation done. I wish to use `toml` for the config files as they are easy
-to parse and easy to read.
+- **Custom Config**: I wish to add custom config to GCMT such that if you were 
+  to use this app, you can custom define some of the currently hard-coded 
+  values. Much of the structure is there for this change, but I still need to 
+  get the implementation done. I wish to use `toml` for the config files as 
+  they are easy to parse and easy to read.
 
-**Semantic Versioning**: I wish to add support for changing the semantic
-versioning automatically before each commit is done. Because I am a Rust,
-Flutter, and (future) React developer, I wish to get the semantic versioning
-done at least for these three languages/frameworks, and I wish this system
-could be designed in a way such that it is extensible / customizable by user
-config files.
+- **Semantic Versioning**: I wish to add support for changing the semantic
+  versioning automatically before each commit is done. Because I am a Rust,
+  Flutter, and (future) React developer, I wish to get the semantic versioning
+  done at least for these three languages/frameworks, and I wish this system
+  could be designed in a way such that it is extensible / customizable by user
+  config files.
 
-**GPT Integration**: I wish I could let GPT help me write my commit messages.
-Ideally, this would read from an environment variable your GPT token and use
-that to query OpenAI's api. I also wish that this system could be designed in a
-way that allows for the use of other LLMs (or even locally hosted ones) for
-writing commit messages.
+- **GPT Integration**: I wish I could let GPT help me write my commit messages.
+  Ideally, this would read from an environment variable your GPT token and use
+  that to query OpenAI's api. I also wish that this system could be designed 
+  in a way that allows for the use of other LLMs (or even locally hosted ones) 
+  for writing commit messages.
 
 ## Why Rust & Disclaimer
 
