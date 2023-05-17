@@ -1,34 +1,33 @@
 use std::{error::Error, fmt::Display};
 
-use crate::commit::constants::SUBJECT_MAX_LEN;
+use crate::commit::constants::MAX_MESSAGE_LEN;
 
 use super::strategy::CaseStrategy;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CommitError {
-    SubjectTooLongError(usize),
+    SubjectTooLongError{available: usize, actual: usize},
     MissingCommitTypeError,
     MissingSubjectError,
-    CaseError(CommitComponent, String, CaseStrategy),
+    CaseError(CasedComponent, String, CaseStrategy),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum CommitComponent {
-    CommitType,
+pub enum CasedComponent {
     Scope,
     Subject,
-    Description,
 }
 
 impl std::fmt::Display for CommitError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self {
-            CommitError::SubjectTooLongError(len) => {
+            CommitError::SubjectTooLongError{available, actual} => {
                 write!(
                     f, 
-                    "The subject is too long: {}, should be less than {} characters", 
-                    len, 
-                    SUBJECT_MAX_LEN
+                    "The subject is too long: {}, should be less than {} characters such that the length of the entire commit message is less than {} characters",
+                    actual,
+                    available,
+                    MAX_MESSAGE_LEN
                 )
             }
             CommitError::MissingCommitTypeError => {
@@ -50,13 +49,11 @@ impl std::fmt::Display for CommitError {
     }
 }
 
-impl Display for CommitComponent {
+impl Display for CasedComponent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CommitComponent::CommitType => write!(f, "Commit Type"),
-            CommitComponent::Scope => write!(f, "Scope"),
-            CommitComponent::Subject => write!(f, "Subject"),
-            CommitComponent::Description => write!(f, "Description"),
+            CasedComponent::Scope => write!(f, "Scope"),
+            CasedComponent::Subject => write!(f, "Subject"),
         }
     }
 }

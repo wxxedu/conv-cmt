@@ -1,1 +1,1 @@
-pub const SUBJECT_MAX_LEN: usize = 72;
+pub const MAX_MESSAGE_LEN: usize = 72;

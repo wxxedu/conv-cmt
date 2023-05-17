@@ -1,4 +1,4 @@
-use std::{error::Error, ffi::OsStr, fmt::Display};
+use std::ffi::OsStr;
 
 use console::Term;
 use dialoguer::{
@@ -10,7 +10,7 @@ use crate::{
         builder::CommitBuilder,
         cmt_type::CommitType,
         commit::Commit,
-        error::{CommitComponent, CommitError},
+        error::{CasedComponent, CommitError},
         strategy::CaseStrategy,
     },
     git::{
@@ -32,21 +32,6 @@ pub struct GitUI<'a, T: AsRef<OsStr>, K: Theme> {
     strategy: CaseStrategy,
     editor: T,
 }
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum GitUIError {
-    EditorError,
-}
-
-impl Display for GitUIError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            GitUIError::EditorError => write!(f, "EditorError"),
-        }
-    }
-}
-
-impl Error for GitUIError {}
 
 impl<'a, T: AsRef<OsStr>, K: Theme> GitUI<'a, T, K> {
     pub fn new(
@@ -126,7 +111,13 @@ impl<'a, T: AsRef<OsStr>, K: Theme> GitUI<'a, T, K> {
             .items(self.types)
             .interact()
             .unwrap();
-        self.builder.commit_type(self.types[selected].clone());
+        let res = self.builder.commit_type(self.types[selected].clone());
+        match res {
+            Ok(_) => {}
+            Err(error) => {
+                self.handle_commit_error(error);
+            }
+        }
     }
 
     fn ask_scope(&mut self) {
@@ -139,7 +130,13 @@ impl<'a, T: AsRef<OsStr>, K: Theme> GitUI<'a, T, K> {
                 if !scp.is_empty() {
                     self.scope.clear();
                     self.scope.push_str(&self.strategy.apply(&scp));
-                    self.builder.scope(&self.scope).unwrap();
+                    let tmp = self.builder.scope(&self.scope);
+                    match tmp {
+                        Ok(_) => {}
+                        Err(error) => {
+                            self.handle_commit_error(error);
+                        }
+                    }
                 }
             }
             Err(_) => {}
@@ -154,7 +151,13 @@ impl<'a, T: AsRef<OsStr>, K: Theme> GitUI<'a, T, K> {
         if !res.is_empty() {
             self.subject.clear();
             self.subject.push_str(&self.strategy.apply(&res));
-            self.builder.subject(&self.subject).unwrap();
+            let tmp = self.builder.subject(&self.subject);
+            match tmp {
+                Ok(_) => {}
+                Err(error) => {
+                    self.handle_commit_error(error);
+                }
+            }
         }
     }
 
@@ -184,7 +187,13 @@ impl<'a, T: AsRef<OsStr>, K: Theme> GitUI<'a, T, K> {
         .interact()
         .unwrap();
         if !change_is_safe {
-            self.builder.breaking_change();
+            let res = self.builder.breaking_change();
+            match res {
+                Ok(_) => {}
+                Err(error) => {
+                    self.handle_commit_error(error);
+                }
+            }
         }
     }
 
@@ -202,7 +211,10 @@ impl<'a, T: AsRef<OsStr>, K: Theme> GitUI<'a, T, K> {
     fn handle_commit_error(&mut self, error: CommitError) {
         self.term.write_line(&format!("{}", error)).unwrap();
         match error {
-            CommitError::SubjectTooLongError(_) => {
+            CommitError::SubjectTooLongError {
+                available: _,
+                actual: _,
+            } => {
                 self.ask_subject();
             }
             CommitError::MissingCommitTypeError => {
@@ -212,18 +224,11 @@ impl<'a, T: AsRef<OsStr>, K: Theme> GitUI<'a, T, K> {
                 self.ask_subject();
             }
             CommitError::CaseError(component, _, _) => match component {
-                CommitComponent::Subject => {
+                CasedComponent::Subject => {
                     self.ask_subject();
                 }
-                CommitComponent::Scope => {
+                CasedComponent::Scope => {
                     self.ask_scope();
-                }
-                CommitComponent::Description => {
-                    self.ask_description();
-                }
-                CommitComponent::CommitType => {
-                    // not possible
-                    self.ask_commit_type();
                 }
             },
         }

@@ -1,7 +1,8 @@
 use super::{
     cmt_type::CommitType,
     commit::Commit,
-    error::{CommitComponent, CommitError},
+    constants::MAX_MESSAGE_LEN,
+    error::{CasedComponent, CommitError},
     strategy::CaseStrategy,
 };
 
@@ -17,9 +18,18 @@ pub struct CommitBuilder {
 
 impl CommitBuilder {
     /// Adds the commit type to the builder.
-    pub fn commit_type(&mut self, commit_type: CommitType) -> &mut Self {
+    pub fn commit_type(
+        &mut self,
+        commit_type: CommitType,
+    ) -> Result<&mut Self, CommitError> {
         self.commit_type = Some(commit_type);
-        self
+        if self.message_len() + self.prefix_len() > MAX_MESSAGE_LEN {
+            return Err(CommitError::SubjectTooLongError {
+                available: MAX_MESSAGE_LEN - self.prefix_len(),
+                actual: self.message_len(),
+            });
+        }
+        Ok(self)
     }
 
     /// Adds the scope to the builder.
@@ -30,12 +40,18 @@ impl CommitBuilder {
         let str_ref = scope.as_ref();
         if !self.strategy.verify(str_ref) {
             return Err(CommitError::CaseError(
-                CommitComponent::Scope,
+                CasedComponent::Scope,
                 str_ref.to_string(),
                 self.strategy,
             ));
         }
         self.scope = Some(scope.as_ref().to_string());
+        if self.message_len() + self.prefix_len() > MAX_MESSAGE_LEN {
+            return Err(CommitError::SubjectTooLongError {
+                available: MAX_MESSAGE_LEN - self.prefix_len(),
+                actual: self.message_len(),
+            });
+        }
         Ok(self)
     }
 
@@ -47,10 +63,16 @@ impl CommitBuilder {
         let str_ref = subject.as_ref();
         if !self.strategy.verify(str_ref) {
             return Err(CommitError::CaseError(
-                CommitComponent::Subject,
+                CasedComponent::Subject,
                 str_ref.to_string(),
                 self.strategy,
             ));
+        }
+        if subject.as_ref().len() > MAX_MESSAGE_LEN - self.prefix_len() {
+            return Err(CommitError::SubjectTooLongError {
+                available: MAX_MESSAGE_LEN - self.prefix_len(),
+                actual: subject.as_ref().len(),
+            });
         }
         self.subject = Some(subject.as_ref().to_string());
         Ok(self)
@@ -63,9 +85,15 @@ impl CommitBuilder {
     }
 
     /// Marks the commit as a breaking change.
-    pub fn breaking_change(&mut self) -> &mut Self {
+    pub fn breaking_change(&mut self) -> Result<&mut Self, CommitError> {
         self.is_breaking_change = true;
-        self
+        if self.message_len() + self.prefix_len() > MAX_MESSAGE_LEN {
+            return Err(CommitError::SubjectTooLongError {
+                available: MAX_MESSAGE_LEN - self.prefix_len(),
+                actual: self.message_len(),
+            });
+        }
+        Ok(self)
     }
 
     /// Builds the commit.
@@ -78,11 +106,11 @@ impl CommitBuilder {
             .subject
             .clone()
             .ok_or(CommitError::MissingSubjectError)?;
-        let scope_len = &self.scope.clone().unwrap_or("".to_string()).len();
-        if commit_type.len() + subject.len() + scope_len > 72 {
-            return Err(CommitError::SubjectTooLongError(
-                commit_type.len() + subject.len() + scope_len,
-            ));
+        if self.message_len() + self.prefix_len() > MAX_MESSAGE_LEN {
+            return Err(CommitError::SubjectTooLongError {
+                available: MAX_MESSAGE_LEN - self.prefix_len(),
+                actual: self.message_len(),
+            });
         }
         Ok(Commit {
             commit_type,
@@ -91,5 +119,28 @@ impl CommitBuilder {
             description: self.description.clone(),
             is_breaking_change: self.is_breaking_change,
         })
+    }
+
+    pub fn prefix_len(&self) -> usize {
+        let mut len: usize = 0;
+        match &self.commit_type {
+            Some(commit_type) => len += commit_type.len(),
+            None => len += 0,
+        }
+        match &self.scope {
+            Some(scope) => len += scope.len() + 2,
+            None => len += 0,
+        }
+        if self.is_breaking_change {
+            len += 1;
+        }
+        len
+    }
+
+    pub fn message_len(&self) -> usize {
+        match &self.subject {
+            Some(subject) => subject.len(),
+            None => 0,
+        }
     }
 }
