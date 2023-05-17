@@ -1,24 +1,22 @@
-use commit::{
-    builder::CommitBuilder, cmt_type::CommitType, commit::Commit,
-    strategy::CaseStrategy,
-};
-use git::git_change::GitChanges;
+use commit::{cmt_type::CommitType, commit::Commit, strategy::CaseStrategy};
 use ui::{
-    git_commit::{ask_commit_type, ask_description, ask_scope, ask_subject},
-    git_stage::show_stage_all_or_select_view,
+    git_commit::{
+        ask_breaking_change, ask_commit_type, ask_description, ask_scope,
+        ask_subject,
+    },
+    git_stage::show_stage_select_view,
 };
 
 use crate::{git::git::Git, ui::git_push::ask_push};
 
 mod commit;
-mod config;
 mod git;
 mod ui;
 
 fn logic() {
     // add
     let mut changes = Git::changes();
-    show_stage_all_or_select_view(&mut changes);
+    show_stage_select_view(&mut changes);
 
     // commit
     let strat = CaseStrategy::Lowercase;
@@ -39,7 +37,7 @@ fn logic() {
     let res = ask_commit_type(&types);
     commit_builder = commit_builder.commit_type(res);
     let scope = ask_scope();
-    let mut scope_str = "".to_string();
+    let scope_str;
     if let Some(scope) = scope {
         scope_str = strat.apply(&scope);
         commit_builder = commit_builder.scope(&scope_str).unwrap();
@@ -49,6 +47,10 @@ fn logic() {
     commit_builder = commit_builder.subject(&subject).unwrap();
     let description = ask_description();
     commit_builder = commit_builder.description(&description);
+    let breaking_change = ask_breaking_change();
+    if breaking_change {
+        commit_builder = commit_builder.breaking_change();
+    }
     let commit = commit_builder.build().unwrap();
     Git::commit(&commit);
     let push = ask_push();

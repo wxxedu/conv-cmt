@@ -35,24 +35,10 @@ impl Git {
             let path = chars.iter().collect::<String>();
             // strip white space
             let path = path.trim();
-            changes.push(GitChange {
-                path: path.to_string(),
-                status,
-            });
+            changes.push(GitChange::new(path.to_string(), status));
         }
         changes.sort_by(|a, b| a.partial_cmp(b).unwrap());
         changes
-    }
-
-    pub fn stage_all() {
-        let output = Self::new_git_command()
-            .arg("add")
-            .arg(".")
-            .output()
-            .expect("Failed to execute git add");
-        if !output.status.success() {
-            panic!("Failed to execute git add");
-        }
     }
 
     pub fn push() {

@@ -52,3 +52,10 @@ pub fn ask_description() -> String {
         String::new()
     }
 }
+
+pub fn ask_breaking_change() -> bool {
+    dialoguer::Confirm::with_theme(&ColorfulTheme::default())
+        .with_prompt("Is this a breaking change?")
+        .interact()
+        .unwrap()
+}

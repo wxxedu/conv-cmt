@@ -1,25 +1,6 @@
 use dialoguer::MultiSelect;
 
-use crate::git::{
-    git::Git,
-    git_change::{GitChange, GitChangeStatus},
-};
-
-pub fn show_stage_all_or_select_view(changes: &mut Vec<GitChange>) {
-    let choices = vec!["Stage all", "Stage selected"];
-    let selection = dialoguer::Select::with_theme(
-        &dialoguer::theme::ColorfulTheme::default(),
-    )
-    .items(&choices)
-    .default(0)
-    .interact()
-    .unwrap();
-    match selection {
-        0 => Git::stage_all(),
-        1 => show_stage_select_view(changes),
-        _ => panic!("Invalid selection"),
-    }
-}
+use crate::git::git_change::{GitChange, GitChangeStatus};
 
 pub fn show_stage_select_view(changes: &mut Vec<GitChange>) {
     let mut checked = vec![false; changes.len()];
@@ -30,6 +11,7 @@ pub fn show_stage_select_view(changes: &mut Vec<GitChange>) {
     }
     let selected =
         MultiSelect::with_theme(&dialoguer::theme::ColorfulTheme::default())
+            .with_prompt("Select changes to stage (press space to select/deselect, a to toggle all, and enter to continue)")
             .items(&changes)
             .defaults(&checked)
             .interact()
