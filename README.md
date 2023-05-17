@@ -43,6 +43,37 @@ After downloading the binary, you want to add it to your path. This depends on
 your platform and the shell that you are using. Once this is done, you can
 start using gcmt by typing `gcmt` in the terminal.
 
+## Features
+
+- **List & Select Unstaged Files**: once `gcmt` command is run, it will show
+  you the list of files that are not committed. You can press `a` to select
+  all, or select the ones that you want to commit.
+
+- **Select Commit Types**: after staging the files for commit, you can select
+  the type of the commit.
+
+- **Write Commit Scope (Optional)**: after selecting the commit type, you can
+  write the scope of the commit, which generally speaking, is a single word
+  that describes what the commit is about. You can check the 
+  [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for
+  more detailed explanation. Note that `gcmt` will by default make all your
+  commit scopes in lower case. I plan to support custom ones in the future.
+
+- **Write Commit Subject**: after selecting the scope of commit, you can then
+  write the subject of the commit. Note that the length of the subject will be
+  limited in such a way that the actual git commit message (not including the
+  description) would be less than 72 characters, following the convention.
+  `gcmt` will reject subjects that are too long.
+
+- **Mark Breaking Change**: you can choose to mark a commit as having a
+  breaking change.
+
+- **Confirmation**: you will be prompted to confirm the commit. If not
+  satisfied, you can go back and change the contents.
+
+- **Push**: you will be prompted whether if you want to push the commit. If
+  yes, `gcmt` will call `git push` for you.
+
 ## Future Plans
 
 There are several things that I wish to do in the future:
