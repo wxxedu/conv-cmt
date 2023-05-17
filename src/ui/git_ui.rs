@@ -1,6 +1,6 @@
 use std::ffi::OsStr;
 
-use console::Term;
+use console::{style, Term};
 use dialoguer::{
     theme::Theme, Confirm, Editor, FuzzySelect, Input, MultiSelect,
 };
@@ -246,7 +246,10 @@ impl<'a, T: AsRef<OsStr>, K: Theme> GitUI<'a, T, K> {
             "Quit",
         ];
         let res = FuzzySelect::with_theme(&self.theme)
-            .with_prompt(format!("Review commit:\n{}", commit))
+            .with_prompt(format!(
+                "Review commit:\n{}",
+                style(&commit).cyan().bold()
+            ))
             .default(0)
             .items(&revise_options)
             .interact()
