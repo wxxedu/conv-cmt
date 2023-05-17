@@ -66,6 +66,10 @@ There are several things that I wish to do in the future:
   in a way that allows for the use of other LLMs (or even locally hosted ones) 
   for writing commit messages.
 
+- **CLI Hooks**: I wish to provide check for git hooks to check whether if a 
+  commit follows the standard. Ideally, this could be used to run both on local
+  machines and on the remote for CI purposes.
+
 ## Why Rust & Disclaimer
 
 I wrote this helper tool in Rust because I am currently learning rust. I am
