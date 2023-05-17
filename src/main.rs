@@ -3,7 +3,7 @@ use std::{env, ffi::OsString};
 use commit::{cmt_type::CommitType, strategy::CaseStrategy};
 use console::Term;
 use dialoguer::theme::ColorfulTheme;
-use ui::git_ui::{self, GitUI};
+use ui::git_ui::GitUI;
 mod commit;
 mod git;
 mod ui;

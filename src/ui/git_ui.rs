@@ -29,7 +29,6 @@ pub struct GitUI<'a, T: AsRef<OsStr>, K: Theme> {
     scope: String,
     subject: String,
     description: String,
-    strategy: CaseStrategy,
     editor: T,
 }
 
@@ -44,10 +43,9 @@ impl<'a, T: AsRef<OsStr>, K: Theme> GitUI<'a, T, K> {
         Self {
             term,
             theme,
-            builder: CommitBuilder::default(),
+            builder: Commit::builder(strategy),
             changes: Vec::new(),
             types,
-            strategy,
             editor,
             scope: String::new(),
             subject: String::new(),
@@ -129,7 +127,7 @@ impl<'a, T: AsRef<OsStr>, K: Theme> GitUI<'a, T, K> {
             Ok(scp) => {
                 if !scp.is_empty() {
                     self.scope.clear();
-                    self.scope.push_str(&self.strategy.apply(&scp));
+                    self.scope.push_str(&self.builder.strategy.apply(&scp));
                     let tmp = self.builder.scope(&self.scope);
                     match tmp {
                         Ok(_) => {}
@@ -150,7 +148,7 @@ impl<'a, T: AsRef<OsStr>, K: Theme> GitUI<'a, T, K> {
             .unwrap();
         if !res.is_empty() {
             self.subject.clear();
-            self.subject.push_str(&self.strategy.apply(&res));
+            self.subject.push_str(&self.builder.strategy.apply(&res));
             let tmp = self.builder.subject(&self.subject);
             match tmp {
                 Ok(_) => {}
@@ -247,7 +245,7 @@ impl<'a, T: AsRef<OsStr>, K: Theme> GitUI<'a, T, K> {
         ];
         let res = FuzzySelect::with_theme(&self.theme)
             .with_prompt(format!(
-                "Review commit:\n{}",
+                "Review commit: {}",
                 style(&commit).cyan().bold()
             ))
             .default(0)
