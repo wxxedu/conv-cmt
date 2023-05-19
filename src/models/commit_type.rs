@@ -1,22 +1,27 @@
 use std::{fmt::Display, io::Write};
 
+use crate::core::my_str::MyStr;
+
 use super::writer::Writer;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CommitType<'a> {
-    name: &'a str,
+pub struct CommitType<'a, const COMMIT_NAME_MAX_SIZE: usize = 10> {
+    name: MyStr<COMMIT_NAME_MAX_SIZE>,
     description: &'a str,
 }
 
 impl<'a> CommitType<'a> {
+    /// Creates a new commit type with the given `name` and `description`.
     pub fn new(name: &'a str, description: &'a str) -> Self {
         Self { name, description }
     }
 
+    /// Gets the name of the commit type.
     pub fn name(&self) -> &'a str {
         self.name
     }
 
+    /// Gets the description of the commit type.
     pub fn description(&self) -> &'a str {
         self.description
     }
