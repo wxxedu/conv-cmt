@@ -8,3 +8,5 @@ edition = "2021"
 [dependencies]
 crossterm = { version = "0.26.1" }
 path-locator = "0.1.0"
+tempfile = "3.5.0"
+uuid = { version = "0.8.2", features = ["v4"] }

@@ -1,1 +1,1 @@
-pub mod git_ui;
+pub mod ui;
