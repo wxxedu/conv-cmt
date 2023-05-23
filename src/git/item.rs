@@ -64,9 +64,9 @@ impl<T: AsRef<str>> From<T> for ItemStatus {
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct GitItem {
-    x: ItemStatus,
-    y: ItemStatus,
-    path: PathBuf,
+    pub x: ItemStatus,
+    pub y: ItemStatus,
+    pub path: PathBuf,
 }
 
 impl Display for GitItem {
@@ -84,5 +84,20 @@ impl GitItem {
 
     pub fn is_staged(&self) -> bool {
         self.x != ItemStatus::Unmodified
+    }
+
+    pub fn parse(line: &str) -> Option<Self> {
+        let x = line.chars().nth(0)?;
+        let y = line.chars().nth(1)?;
+        let path = line[3..].trim();
+        let x = ItemStatus::from(x.to_string());
+        let y = ItemStatus::from(y.to_string());
+        let path = PathBuf::from(path);
+        Some(Self::new(x, y, path))
+    }
+
+    pub fn copy_status_from(&mut self, other: &Self) {
+        self.x = other.x;
+        self.y = other.y;
     }
 }
