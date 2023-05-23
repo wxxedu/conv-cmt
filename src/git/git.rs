@@ -1,66 +1,31 @@
-use std::process::Command;
+use std::{error::Error, fmt::Display};
 
-use crate::commit::commit::Commit;
+use super::item::GitItem;
 
-use super::git_change::{GitChange, GitChangeStatus};
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
+pub struct GitError {
+    pub message: String,
+}
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Git;
-
-impl Git {
-    pub fn new_git_command() -> Command {
-        Command::new("git")
+impl Display for GitError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", &self.message)
     }
+}
 
-    pub fn changes() -> Vec<GitChange> {
-        let output = Self::new_git_command()
-            .arg("status")
-            .arg("--porcelain")
-            .output()
-            .expect("Failed to execute git status");
-        let out_str = String::from_utf8(output.stdout).unwrap();
-        let mut changes = Vec::new();
-        for line in out_str.lines() {
-            let mut chars = line.chars().collect::<Vec<char>>();
-            chars.reverse();
-            let status = match chars.pop() {
-                Some(' ') => GitChangeStatus::Unstaged,
-                _ => GitChangeStatus::Staged,
-            };
-            chars.pop();
-            chars.reverse();
-            let path = chars.iter().collect::<String>();
-            // strip white space
-            let path = path.trim();
-            changes.push(GitChange::new(path.to_string(), status));
-        }
-        changes.sort_by(|a, b| a.partial_cmp(b).unwrap());
-        changes
-    }
+impl Error for GitError {}
 
-    pub fn push() -> Result<String, String> {
-        let output = Self::new_git_command()
-            .arg("push")
-            .output()
-            .expect("Failed to execute git push");
-        if output.status.success() {
-            Ok(String::from_utf8(output.stdout).unwrap())
-        } else {
-            Err(String::from_utf8(output.stderr).unwrap())
-        }
-    }
+unsafe impl Send for GitError {}
 
-    pub fn commit(cmt: &Commit) -> Result<String, String> {
-        let output = Self::new_git_command()
-            .arg("commit")
-            .arg("-m")
-            .arg(&cmt.to_string())
-            .output()
-            .expect("Failed to execute git commit");
-        if output.status.success() {
-            Ok(String::from_utf8(output.stdout).unwrap())
-        } else {
-            Err(String::from_utf8(output.stderr).unwrap())
-        }
-    }
+unsafe impl Sync for GitError {}
+
+pub trait Git {
+    /// Gets all the items in the current git repository
+    fn get_items(&self) -> Result<Vec<GitItem>, GitError>;
+
+    /// Adds the given item to the git repository
+    fn add(&self, item: &mut GitItem) -> Result<GitError, String>;
+
+    /// Removes the given item from the git repository
+    fn remove(&self, item: &mut GitItem) -> Result<GitError, String>;
 }

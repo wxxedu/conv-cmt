@@ -6,10 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-console = "0.15.5"
-dialoguer = {version = "0.10.4", features = ["fuzzy-select", "editor", "history", "completion"]}
-lazy_static = "1.4.0"
-regex = "1.8.1"
-serde = {version = "1.0.163", features = ["derive"]}
-toml = "0.7.3"
-
+crossterm = { version = "0.26.1" }
+path-locator = "0.1.0"
