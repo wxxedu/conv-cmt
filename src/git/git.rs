@@ -3,7 +3,6 @@ use std::{
     fmt::{Debug, Display},
     marker::PhantomData,
     path::Path,
-    process::Command,
 };
 
 use crate::{
